@@ -1,0 +1,28 @@
+# R function that finds peaks in a vector (e.g. coverage of seq-reads over a chromosome) or Rle 
+# and returns a data-frame with the position and hight of each peak.
+# The resolution is used for smoothing the coverage trace (total filter length is 2*resolution + 1)
+
+locate_peak_hight <- function(x,resolution=50){
+  #resolution gives the filter size
+  f1 <- c(rep((1/(2*resolution)),resolution),0,rep(-(1/(2*resolution)),resolution))
+  vx <- as.vector(x)
+  x1<-filter(vx,f1, circular = T) # lines(x1,col='green')
+  sel1 <- descent_through(x1)
+  #points(which(sel1),x[sel1])
+  df_out <- data.frame(pos=which(sel1), height=vx[which(sel1)])
+  return(df_out)
+}
+#########################################################
+###############################################
+descent_through<- function(x,thresh=0){
+  above<- x > thresh
+  intersect.points<-which(diff(above) < 0)  #gives -1 or 1 for points before the intersect
+  x.slopes<-x[intersect.points+1]-x[intersect.points]
+  
+  x.points<-((thresh-x[intersect.points])/x.slopes)+intersect.points
+  x.point<-round(x.points)
+  out1<-rep(F,length(x))
+  out1[x.point]<-T  ## make true false vector
+  return(out1)
+}
+################################################
