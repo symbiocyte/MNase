@@ -1,0 +1,23 @@
+# This function takes in dataframes in a list (e.g. the output of locate_peak_hight from 
+# lapply(Rle_List_input,locate_peak_hight,resolution)
+# to create GRanges. seqlength of the chromosomes are required for trimming to avoid 'out of range' errors.
+
+
+makeGRanges_from_pos_height<- function(pos_list, seqlength_in ,width_in=10){
+  #gets dataframes with pos and heigth
+  require(GenomicRanges)
+  pos_list2<- sapply(pos_list,function(x){x$pos - round(width_in/2)})
+  height_list2<- sapply(pos_list,function(x){x$height})
+  #ir1 <- lapply(pos_list2,IRanges,width=width_in)
+  #unlist(pos_list2)
+  ir1 <- IRanges(start = unlist(pos_list2),width=width_in)
+  nr_of_peaks <- sapply(pos_list,nrow)
+  chr <- names(pos_list)
+  
+  chr2 <- unname(unlist(mapply(rep,chr,nr_of_peaks)))
+  gr1 <- GRanges(chr2,ir1, seqlengths = seqlength_in)  ## check here
+  mcols(gr1)<- data.frame(height= unname(unlist(height_list2)))
+  gr1 <- trim(gr1)
+  return(gr1)
+}
+
