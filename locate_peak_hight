@@ -1,6 +1,7 @@
 # R function that finds peaks in a vector (e.g. coverage of seq-reads over a chromosome) or Rle 
 # and returns a data-frame with the position and hight of each peak.
 # The resolution is used for smoothing the coverage trace (total filter length is 2*resolution + 1)
+# The function decent through is required in locate_peak_hight
 
 locate_peak_hight <- function(x,resolution=50){
   #resolution gives the filter size
